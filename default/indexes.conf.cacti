@@ -1,0 +1,5 @@
+[cacti]
+maxTotalDataSizeMB = 2000
+homePath = $SPLUNK_DB/cacti/db
+thawedPath = $SPLUNK_DB/cacti/thaweddb
+coldPath = $SPLUNK_DB/cacti/colddb
