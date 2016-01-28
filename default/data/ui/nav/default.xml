@@ -1,11 +1,18 @@
 <nav search_view="search" color="#65A637">
+  <view name="cacti_status" />
   <view name="cacti__quick_chart" default='true' />
-  <view name="search" />
-<!--  <view name="data_models" />-->
-<!--  <view name="reports" />-->
-<!--  <view name="alerts" />-->
-  <view name="dashboards" />
+  <!--<view name="search" />-->
+  <!--<view name="data_models" />-->
+  <!--<view name="reports" />-->
+  <!--<view name="alerts" />-->
+  <!--<view name="dashboards" />-->
   <collection label="Lookups">
     <saved name="cacti_lookup_mirage_build" label="Rebuild Cacti Mirage Lookups"/>
+  </collection>
+  <collection label="Search">
+    <view name="search" />
+    <view name="reports" />
+    <view name="dashboards" />
+    <view name="alerts" />
   </collection>
 </nav>
