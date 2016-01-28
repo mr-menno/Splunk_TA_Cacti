@@ -1,7 +1,7 @@
 <form>
   <label>Cacti - Quick Chart</label>
   <fieldset submitButton="true">
-    <input type="dropdown" token="cacti" searchWhenChanged="true">
+    <input type="dropdown" token="cacti" searchWhenChanged="false">
       <label>Cacti Host</label>
       <search>
         <query>| inputlookup cacti_lookup_mirage | stats dc(hostname) as hosts by cacti | eval value=cacti | eval label=cacti." (Hosts: ".hosts.")"</query>
@@ -9,37 +9,44 @@
       <fieldForLabel>label</fieldForLabel>
       <fieldForValue>value</fieldForValue>
     </input>
-    <input type="multiselect" token="host_ids" searchWhenChanged="true">
+    <input type="dropdown" token="host_ids" searchWhenChanged="false">
       <label>Hostnames</label>
       <search>
-        <query>| inputlookup cacti_lookup_mirage | search cacti=$cacti$ | stats dc(name_cache) as name_cache,values(ip) as ip by hostname,host_id  | table hostname,ip,name_cache,host_id | eval label=hostname."|".ip | eval value=host_id</query>
+        <query>| inputlookup cacti_lookup_mirage | search cacti=$cacti$ | stats dc(name_cache) as name_cache,values(ip) as ip by hostname,host_id  | table hostname,ip,name_cache,host_id | eval label=hostname." | ".ip | eval value=host_id</query>
         <earliest>0</earliest>
-        <latest></latest>
       </search>
       <fieldForLabel>label</fieldForLabel>
       <fieldForValue>value</fieldForValue>
-      <prefix>(</prefix>
+      <prefix>(host_id=</prefix>
       <suffix>)</suffix>
-      <valuePrefix>host_id=</valuePrefix>
-      <delimiter> OR </delimiter>
     </input>
-    <input type="multiselect" token="local_data_id">
-      <label>Object</label>
-      <choice value="*">all</choice>
-      <default>*</default>
-      <prefix>(</prefix>
-      <suffix>)</suffix>
-      <initialValue>*</initialValue>
-      <valuePrefix>local_data_id="</valuePrefix>
-      <valueSuffix>"</valueSuffix>
-      <delimiter> OR </delimiter>
+    <input type="dropdown" token="kpi" searchWhenChanged="false">
+      <label>KPI</label>
       <search>
-        <query>| inputlookup cacti_lookup_mirage | search cacti=$cacti$ $host_ids$ | stats count by local_data_id,name_cache</query>
+        <query>eventtype=cacti:mirage host=$cacti$ $host_ids$ rrdn=* data_source_type_id=* | eval function = if(data_source_type_id==1,"| timechart span=5m last(rrdv) by rrdn","| reverse | streamstats current=t window=2 global=f range(_time) as deltaTime range(rrdv) AS rrd_value_delta by rrdn | eval isTraffic = if(like(rrdn,\"%traffic%\"),1,0) | eval kpi = if(isTraffic==1,rrd_value_delta*8/1024/1024/deltaTime,rrd_value_delta/deltaTime) | timechart span=5m last(kpi) by rrdn") | stats count by rrdn data_source_type_id function | sort rrdn</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>rrdn</fieldForLabel>
+      <fieldForValue>rrdn</fieldForValue>
+      <change>
+        <set token="measurement">$row.data_source_type_id$</set>
+        <set token="function">$row.function$</set>
+      </change>
+    </input>
+    <input type="dropdown" token="local_data_id_counter" searchWhenChanged="true">
+      <label>Object</label>
+      <search>
+        <query>eventtype=cacti:mirage host=$cacti$ $host_ids$ rrdn=$kpi$ | dedup host name_cache | table name_cache ldi</query>
+        <earliest>-15m@m</earliest>
+        <latest>now</latest>
       </search>
       <fieldForLabel>name_cache</fieldForLabel>
-      <fieldForValue>local_data_id</fieldForValue>
+      <fieldForValue>ldi</fieldForValue>
+      <prefix>(ldi="</prefix>
+      <suffix>")</suffix>
     </input>
-    <input type="time" token="time">
+    <input type="time" token="time" searchWhenChanged="false">
       <label></label>
       <default>
         <earliest>-24h@h</earliest>
@@ -52,11 +59,10 @@
       <chart>
         <title>Cacti Chart</title>
         <search>
-          <query>eventtype=cacti:mirage host=$cacti$ $host_ids$ $local_data_id$ | timechart avg(rrd_value) by name_cache</query>
+          <query>eventtype=cacti:mirage host=$cacti$ $host_ids$ $local_data_id_counter$ $function$</query>
           <earliest>$time.earliest$</earliest>
           <latest>$time.latest$</latest>
         </search>
-        <option name="charting.chart">line</option>
         <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
         <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
         <option name="charting.axisTitleX.visibility">visible</option>
@@ -66,10 +72,12 @@
         <option name="charting.axisY.scale">linear</option>
         <option name="charting.axisY2.enabled">0</option>
         <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
         <option name="charting.chart.bubbleMaximumSize">50</option>
         <option name="charting.chart.bubbleMinimumSize">10</option>
         <option name="charting.chart.bubbleSizeBy">area</option>
         <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.overlayFields">traffic_out</option>
         <option name="charting.chart.showDataLabels">none</option>
         <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
         <option name="charting.chart.stackMode">default</option>
