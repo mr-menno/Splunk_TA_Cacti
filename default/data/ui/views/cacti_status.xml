@@ -2,6 +2,7 @@
   <label>Cacti Polling &amp; Lookups Status</label>
   <row>
     <panel>
+      <title>Polling Events</title>
       <chart>
         <title>cacti:mirage poller events by cacti server</title>
         <search ref="cacti:mirage events by cacti server"></search>
@@ -30,12 +31,11 @@
         <option name="charting.legend.placement">right</option>
       </chart>
     </panel>
-  </row>
-  <row>
     <panel>
-      <single>
+      <title>Data Sources by Cacti Host</title>
+      <chart>
         <search>
-          <query>eventtype=cacti:lookup:mirage host="ONHOOD-SPLKFW-02"  | stats dc(local_data_id) AS unique_ds | fields unique_ds</query>
+          <query>eventtype=cacti:lookup:mirage  | stats dc(local_data_id) AS "Unique Datasources" by host</query>
           <earliest>-24h@h</earliest>
           <latest>now</latest>
         </search>
@@ -55,50 +55,55 @@
         <option name="useThousandSeparators">1</option>
         <option name="underLabel">This count should match your data source count in Cacti's GUI [ Console &gt; Data Sources ]</option>
         <option name="linkView">search</option>
-        <option name="drilldown">none</option>
-      </single>
-    </panel>
-    <panel>
-      <single>
-        <search>
-          <query>eventtype=cacti:lookup:mirage host="Cacti-IMS"  | stats dc(local_data_id) AS unique_ds | fields unique_ds</query>
-          <earliest>-24h@h</earliest>
-          <latest>now</latest>
-        </search>
-        <option name="afterLabel">unique data sources indexed from lookup</option>
-        <option name="beforeLabel">Cacti IMS -</option>
-        <option name="colorBy">value</option>
-        <option name="colorMode">none</option>
-        <option name="numberPrecision">0</option>
-        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
-        <option name="rangeValues">[0,30,70,100]</option>
-        <option name="showSparkline">1</option>
-        <option name="showTrendIndicator">1</option>
-        <option name="trendColorInterpretation">standard</option>
-        <option name="trendDisplayMode">absolute</option>
-        <option name="trendInterval">auto</option>
-        <option name="useColors">0</option>
-        <option name="useThousandSeparators">1</option>
-        <option name="underLabel">This count should match your data source count in Cacti's GUI [ Console &gt; Data Sources ]</option>
-        <option name="linkView">search</option>
-        <option name="drilldown">none</option>
-      </single>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
     </panel>
   </row>
   <row>
     <panel>
+	<title>Cacti Lookup Scheduled Rebuilds (wait for first scheduled rebuild)</title>
       <table>
         <search>
-          <query>index=_audit action=search info=completed savedsearch_name="cacti_lookup_mirage_build"
-| table _time host user info savedsearch_name total_run_time event_count result_count available_count scan_count drop_count</query>
+          <query>index=_audit action=search info=completed savedsearch_name="cacti_lookup_mirage_build" | table _time host user info savedsearch_name total_run_time event_count result_count available_count scan_count drop_count</query>
           <earliest>@d</earliest>
           <latest>now</latest>
         </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
       </table>
     </panel>
   </row>
   <row>
     <panel>
+<title>Cacti Lookup Source Data Generation</title>
       <table>
         <search>
           <query>index=_internal message=*cacti_lookup_mirage.py* component="ExecProcessor" command=python NOT StreamedSearch
@@ -115,9 +120,10 @@
   </row>
   <row>
     <panel>
+<title>Cacti Spine Events</title>
       <event>
         <search>
-          <query>index=cacti sourcetype=cacti:system spine</query>
+          <query>`cacti_index` sourcetype=cacti:system spine</query>
           <earliest>@d</earliest>
           <latest>now</latest>
         </search>
@@ -136,9 +142,10 @@
   </row>
   <row>
     <panel>
+<title>Cacti Spine Errors</title>
       <event>
         <search>
-          <query>index=cacti sourcetype=cacti:system spine error</query>
+          <query>`cacti_index` sourcetype=cacti:system spine error</query>
           <earliest>@d</earliest>
           <latest>now</latest>
         </search>
