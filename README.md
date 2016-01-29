@@ -1,4 +1,4 @@
-# Cacti Mirage Add-On for Splunk v1.0.0
+# Cacti Mirage Add-On for Splunk v1.0.1
 
 ## Setup and Install
 This TA is deployed on Forwarders, Indexers and Search Heads.
