@@ -20,7 +20,12 @@ To complete the install, you will need to update the follow:
 ### Cacti Server / Universal Forwarder
 To complete the ingestion of data, deploy the Splunk\_TA\_Cacti to the forwarder installed on the same host as your Cacti implementation.  If you have multiple installs, you can deploy it across multiple Cacti servers.
 
-For this add-on to work, you will need to have installed the Cacti Mirage plugin to the Cacti servers.  In addition, you will need the following information:
+For this add-on to work, you will need to have installed the Cacti Mirage plugin to the Cacti servers.  
+
+Cacti Mirage: http://docs.cacti.net/userplugin:mirage
+Cacti Mirage Github: https://github.com/n00badmin/mirage
+
+In addition, you will need the following information:
  * Path to Cacti install (i.e. /var/www/html/cacti or /usr/share/lib/cacti)
  * Path to mirage\_poller\_output.log (i.e /var/www/html/cacti/log/mirage\_poller\_output.log)
  * Index to send data to (either default or index=cacti, etc)
