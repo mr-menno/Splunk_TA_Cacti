@@ -23,7 +23,7 @@
     <input type="dropdown" token="kpi" searchWhenChanged="false">
       <label>KPI</label>
       <search>
-        <query>eventtype=cacti:mirage host=$cacti$ $host_ids$ rrdn=* data_source_type_id=* | eval function = if(data_source_type_id==1,"| timechart span=5m last(rrdv) by rrdn","| reverse | streamstats current=t window=2 global=f range(_time) as deltaTime range(rrdv) AS rrd_value_delta by rrdn | eval isTraffic = if(like(rrdn,\"%traffic%\"),1,0) | eval kpi = if(isTraffic==1,rrd_value_delta*8/1024/1024/deltaTime,rrd_value_delta/deltaTime) | timechart span=5m last(kpi) by rrdn") | stats count by rrdn data_source_type_id function | sort rrdn</query>
+        <query>eventtype=cacti:mirage host=$cacti$ $host_ids$ rrdn=* data_source_type_id=* | eval function = if(data_source_type_id==1,"| timechart avg(rrdv) by rrdn","| reverse | streamstats current=t window=2 global=f range(_time) as deltaTime range(rrdv) AS rrd_value_delta by rrdn | eval isTraffic = if(like(rrdn,\"%traffic%\"),1,0) | eval kpi = if(isTraffic==1,rrd_value_delta*8/1024/1024/deltaTime,rrd_value_delta/deltaTime) | timechart avg(kpi) by rrdn") | stats count by rrdn data_source_type_id function | sort rrdn</query>
         <earliest>-15m</earliest>
         <latest>now</latest>
       </search>
